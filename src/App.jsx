@@ -1,22 +1,31 @@
 import { useEffect, useState } from 'react';
+import {
+  FaCircle,
+  FaGlobeAmericas,
+  FaMoon,
+  FaRocket,
+  FaStar,
+  FaTimesCircle,
+} from 'react-icons/fa';
 
 const MAX_TOSSES = 3;
 const LEADERBOARD_KEY = 'cosmic-toss-leaderboard';
 
 const scoringZones = [
-  { label: 'Low Earth Orbit', emoji: '🌍', points: 1 },
-  { label: 'Lunar Zone', emoji: '🌕', points: 3 },
-  { label: 'Mars Shot', emoji: '🔴', points: 5 },
-  { label: 'Deep Space', emoji: '✨', points: 10 },
+  { label: 'Low Earth Orbit', icon: 'earth', points: 1 },
+  { label: 'Lunar Zone', icon: 'moon', points: 3 },
+  { label: 'Mars Shot', icon: 'mars', points: 5 },
+  { label: 'Deep Space', icon: 'star', points: 10 },
 ];
 
-const missZone = { label: 'Missed Orbit', emoji: '☄️', points: 0 };
+const missZone = { label: 'Missed Orbit', icon: 'miss', points: 0 };
 
-function getMedal(rank) {
-  if (rank === 1) return '🥇';
-  if (rank === 2) return '🥈';
-  if (rank === 3) return '🥉';
-  return '';
+function ZoneIcon({ name }) {
+  if (name === 'earth') return <FaGlobeAmericas />;
+  if (name === 'moon') return <FaMoon />;
+  if (name === 'mars') return <FaCircle />;
+  if (name === 'star') return <FaStar />;
+  return <FaTimesCircle />;
 }
 
 function App() {
@@ -92,12 +101,10 @@ function App() {
         </div>
 
         <div className="title-block">
-          <p className="eyebrow">Hack at UCI arcade challenge</p>
-          <h1 id="game-title">🚀 Cosmic Toss</h1>
-          <p className="intro-copy">
-            Think you've got what it takes to launch into orbit? Toss your beanbag across the
-            galaxy — land it in the right zone and claim your place on the leaderboard.
-          </p>
+          <h1 id="game-title">
+            <FaRocket className="title-icon" />
+            Cosmic Toss
+          </h1>
         </div>
 
         <div className="player-card">
@@ -131,7 +138,9 @@ function App() {
               onClick={() => recordToss(zone)}
               disabled={!canToss}
             >
-              <span className="zone-emoji">{zone.emoji}</span>
+              <span className={`zone-icon zone-icon-${zone.icon}`}>
+                <ZoneIcon name={zone.icon} />
+              </span>
               <span>{zone.label}</span>
               <strong>{zone.points} point{zone.points > 1 ? 's' : ''}</strong>
             </button>
@@ -139,14 +148,24 @@ function App() {
         </div>
 
         <button className="miss-button" onClick={() => recordToss(missZone)} disabled={!canToss}>
-          <span>☄️ Missed the hole</span>
+          <span className="miss-label">
+            <FaTimesCircle />
+            Missed the hole
+          </span>
           <strong>0 points</strong>
         </button>
 
         <div className="toss-track">
           {Array.from({ length: MAX_TOSSES }).map((_, index) => (
             <div className="toss-slot" key={index}>
-              {tosses[index] ? `${tosses[index].emoji} ${tosses[index].points}` : `Toss ${index + 1}`}
+              {tosses[index] ? (
+                <>
+                  <ZoneIcon name={tosses[index].icon} />
+                  {tosses[index].points}
+                </>
+              ) : (
+                `Toss ${index + 1}`
+              )}
             </div>
           ))}
         </div>
@@ -155,7 +174,6 @@ function App() {
           <button className="primary-action" onClick={submitScore} disabled={!canSubmit}>
             Submit Score
           </button>
-          <button onClick={startNewPlayer}>New Player</button>
           <button className="danger-action" onClick={resetLeaderboard}>
             Reset Leaderboard
           </button>
@@ -175,7 +193,7 @@ function App() {
             {leaderboard.map((entry, index) => (
               <article className="leaderboard-entry" key={entry.id}>
                 <div className="rank">
-                  <span>{getMedal(index + 1)}</span>
+                  {index + 1}
                 </div>
                 <div className="player-result">
                   <h3>{entry.name}</h3>
