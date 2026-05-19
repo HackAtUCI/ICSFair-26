@@ -9,7 +9,7 @@ import {
 } from 'react-icons/fa';
 
 const MAX_TOSSES = 3;
-const LEADERBOARD_KEY = 'cosmic-toss-leaderboard';
+const LEADERBOARD_KEY = 'comet-toss-leaderboard';
 
 const scoringZones = [
   { label: 'Low Earth Orbit', icon: 'earth', points: 1 },
@@ -57,6 +57,14 @@ function App() {
     setScore(score + zone.points);
   }
 
+  function removeToss(indexToRemove) {
+    const tossToRemove = tosses[indexToRemove];
+    if (!tossToRemove) return;
+
+    setTosses(tosses.filter((_, index) => index !== indexToRemove));
+    setScore(score - tossToRemove.points);
+  }
+
   function submitScore() {
     if (!canSubmit) return;
 
@@ -97,13 +105,13 @@ function App() {
       <section className="game-panel" aria-labelledby="game-title">
         <div className="brand-bar">
           <span>Hack at UCI</span>
-          <span>Cosmic Toss Station</span>
+          <span>Comet Toss Station</span>
         </div>
 
         <div className="title-block">
           <h1 id="game-title">
             <FaRocket className="title-icon" />
-            Cosmic Toss
+            Comet Toss
           </h1>
         </div>
 
@@ -160,8 +168,17 @@ function App() {
             <div className="toss-slot" key={index}>
               {tosses[index] ? (
                 <>
-                  <ZoneIcon name={tosses[index].icon} />
-                  {tosses[index].points}
+                  <span className="toss-result">
+                    <ZoneIcon name={tosses[index].icon} />
+                    {tosses[index].points}
+                  </span>
+                  <button
+                    className="remove-toss"
+                    onClick={() => removeToss(index)}
+                    aria-label={`Remove toss ${index + 1}`}
+                  >
+                    <FaTimesCircle />
+                  </button>
                 </>
               ) : (
                 `Toss ${index + 1}`
